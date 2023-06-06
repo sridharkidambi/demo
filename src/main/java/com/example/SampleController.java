@@ -1,6 +1,10 @@
 package com.example;
 
 import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.vavr.CheckedRunnable;
+import io.vavr.control.Try;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -51,6 +55,22 @@ public class SampleController {
 //        System.out.println(rateLimiter.getRateLimiterConfig());
 //        System.out.println(rateLimiter.getRateLimiterConfig());
 //        System.out.println(rateLimiter.getRateLimiterConfig());
+
+        // Decorate your call to BackendService.doSomething()
+
+
+        rateLimiter.getEventPublisher()
+                .onSuccess(event -> System.out.println("SK success" + event.getEventType().name()))
+                .onFailure(event -> System.out.println("SK Failure" + event.getEventType().name()));
+
+//        CheckedRunnable restrictedCall = RateLimiter
+//                .decorateCheckedRunnable(rateLimiter, externalApiCalls::ExternalAPI);
+//
+//        Try.run(restrictedCall)
+//                .andThenTry(restrictedCall)
+//                .onFailure((RequestNotPermitted throwable) -> System.out.println(throwable.getMessage()));
+
+
         try{
           String s=  externalApiCalls.ExternalAPI();
             return new ResponseEntity<>(s, HttpStatus.OK);
